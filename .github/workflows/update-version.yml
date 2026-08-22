@@ -1,0 +1,32 @@
+name: Update Version JSON
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update version.json
+        run: |
+          VERSION_TAG="${{ github.event.release.tag_name }}"
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          echo "{\"version\": \"$VERSION_TAG\", \"released_at\": \"$TIMESTAMP\"}" > version.json
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@://github.com"
+
+          git add version.json
+          git commit -m "chore: update version.json to ${{ github.event.release.tag_name }} [skip ci]"
+          git push origin HEAD:${{ github.event.repository.default_branch }}
