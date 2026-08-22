@@ -1,0 +1,13 @@
+name: Trigger Cloudflare Pages Deploy
+
+on:
+  release:
+    types: [published] # Се активира автоматски кога објавувате нов Release во јавното репозиториум
+
+jobs:
+  trigger-cloudflare:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Cloudflare Deploy Hook
+        run: |
+          curl -X POST "${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}"
